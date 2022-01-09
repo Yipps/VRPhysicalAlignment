@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using UnityEngine;
+using UnityEngine.UI;
 
 [CreateAssetMenu(menuName = "PhysicalAlignmentData")]
 public class PhysicalAlignmentTool : ScriptableObject
@@ -63,16 +66,39 @@ public class PhysicalAlignmentTool : ScriptableObject
 
     private void OnDisable()
     {
-        SaveAlignment();
         flaggedObjects.Clear();
     }
 
-    public void LoadAlignment(AlignmentObject[] alignmentObjects)
+    public void LoadAlignment()
     {
-        foreach (AlignmentObject alignmentObject in alignmentObjects)
+        string path = Application.persistentDataPath + "/" + saveName + ".json";
+        if (File.Exists(path))
         {
-            GameObject target = GameObject.Find(alignmentObject.objectName);
+            String data = File.ReadAllText(path);
+            Debug.Log(data);
+            AlignmentObject[] alignmentObjects = JsonHelper.FromJson<AlignmentObject>(data);
+
+            foreach (AlignmentObject alignmentObject in alignmentObjects)
+            {
+                string name = alignmentObject.objectName;
+                if (alignmentObject.objectParentName != "none")
+                {
+                    name = alignmentObject.objectParentName + "/" + alignmentObject.objectName;
+                }
+                GameObject obj = GameObject.Find(name);
+
+                obj.transform.position = alignmentObject.position;
+                
+
+            }
         }
+        else
+        {
+            
+        }
+        
+        
+
         
     }
     

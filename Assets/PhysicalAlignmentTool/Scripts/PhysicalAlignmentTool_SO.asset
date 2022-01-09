@@ -13,5 +13,24 @@ MonoBehaviour:
   m_Name: PhysicalAlignmentTool_SO
   m_EditorClassIdentifier: 
   saveName: AlignmentSave
-  _alignmentObjects: []
-  jsonDebug: '{"Items":[]}'
+  _alignmentObjects:
+  - objectName: Stud Pile
+    objectParentName: none
+    position: {x: 0, y: 0, z: 2.354}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  - objectName: Stud Pile
+    objectParentName: Reflection Probes
+    position: {x: 1.9100002, y: 1.65, z: -0.00000023841858}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  - objectName: Stud Pile
+    objectParentName: Workshop Set
+    position: {x: 0, y: 2.63, z: 0}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  - objectName: Stud Frame
+    objectParentName: Workshop Set
+    position: {x: 1.7800002, y: 1.22, z: -0.05000019}
+    rotation: {x: -0, y: 0.7071068, z: -0, w: 0.7071068}
+  jsonDebug: '{"Items":[{"objectName":"Stud Pile","objectParentName":"none","position":{"x":0.0,"y":0.0,"z":2.3540000915527345},"rotation":{"x":0.0,"y":0.7071068286895752,"z":0.0,"w":0.7071068286895752}},{"objectName":"Stud
+    Pile","objectParentName":"Reflection Probes","position":{"x":1.910000205039978,"y":1.649999976158142,"z":-2.384185791015625e-7},"rotation":{"x":0.0,"y":0.7071068286895752,"z":0.0,"w":0.7071068286895752}},{"objectName":"Stud
+    Pile","objectParentName":"Workshop Set","position":{"x":0.0,"y":2.630000114440918,"z":0.0},"rotation":{"x":0.0,"y":0.7071068286895752,"z":0.0,"w":0.7071068286895752}},{"objectName":"Stud
+    Frame","objectParentName":"Workshop Set","position":{"x":1.7800002098083497,"y":1.2200000286102296,"z":-0.05000019073486328},"rotation":{"x":0.0,"y":0.7071068286895752,"z":0.0,"w":0.7071068286895752}}]}'
