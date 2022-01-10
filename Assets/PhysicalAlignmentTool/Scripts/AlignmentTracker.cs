@@ -9,21 +9,21 @@ public class AlignmentTracker : MonoBehaviour
 {
     private bool _isMovable;
     private BoxCollider _runtimeCollider;
-    
     private PhysicalAlignmentTool physicalAlignmentTool;
+    private Bounds renderBounds;
 
     void Start()
     {
-        physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool_SO.asset",typeof(PhysicalAlignmentTool));
+        physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
         
         if (!GetComponent<Collider>())
         {
             //Make a min size for this if there are no renderers
             _runtimeCollider = gameObject.AddComponent<BoxCollider>();
 
-            Bounds bounds = CalculateBounds();
-            _runtimeCollider.size = bounds.size;
-            _runtimeCollider.center = bounds.center;
+            renderBounds = CalculateBounds();
+            _runtimeCollider.size = renderBounds.size;
+            _runtimeCollider.center = renderBounds.center;
         }
         
         //Add self to alignmenttool list, if we fail delete this component
@@ -87,7 +87,10 @@ public class AlignmentTracker : MonoBehaviour
         transform.rotation = currentRotation;
 
         return bounds;
+    }
 
-        
+    public Bounds GetRendererBounds()
+    {
+        return renderBounds;
     }
 }

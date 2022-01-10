@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e42f6ac957f30e44fa6a00d32ea423a8, type: 3}
-  m_Name: PhysicalAlignmentTool_SO
+  m_Name: PhysicalAlignmentTool
   m_EditorClassIdentifier: 
   saveName: AlignmentSave
   _alignmentObjects:
