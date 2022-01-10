@@ -72,34 +72,32 @@ public class PhysicalAlignmentTool : ScriptableObject
     public void LoadAlignment()
     {
         string path = Application.persistentDataPath + "/" + saveName + ".json";
+        
         if (File.Exists(path))
         {
+            //Get json string
             String data = File.ReadAllText(path);
-            Debug.Log(data);
-            AlignmentObject[] alignmentObjects = JsonHelper.FromJson<AlignmentObject>(data);
+            //Deserialize json
+            AlignmentObject[] alignmentData = JsonHelper.FromJson<AlignmentObject>(data);
 
-            foreach (AlignmentObject alignmentObject in alignmentObjects)
+            //iterate through all data objects
+            foreach (AlignmentObject alignmentObject in alignmentData)
             {
                 string name = alignmentObject.objectName;
+                //Add parent name for hierarchy search
                 if (alignmentObject.objectParentName != "none")
-                {
                     name = alignmentObject.objectParentName + "/" + alignmentObject.objectName;
-                }
                 GameObject obj = GameObject.Find(name);
-
-                obj.transform.position = alignmentObject.position;
                 
-
+                //Set transforms
+                obj.transform.position = alignmentObject.position;
+                obj.transform.rotation = alignmentObject.rotation;
             }
         }
         else
         {
-            
+            Debug.LogError("Json not found at " + path);
         }
-        
-        
-
-        
     }
     
 
