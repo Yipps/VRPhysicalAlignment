@@ -8,6 +8,7 @@ using UnityEngine.XR;
 public class VRAligner : MonoBehaviour
 {
 
+    [SerializeField]
     private AlignmentGizmo _gizmo;
 
     private bool isTranslating;
@@ -20,54 +21,25 @@ public class VRAligner : MonoBehaviour
 
     void Start()
     {
-        _gizmo = GetComponentInChildren<AlignmentGizmo>();
-
-        
+        //_gizmo = GetComponentInChildren<AlignmentGizmo>();
         
     }
-
-    void GetDevice()
-    {
-        InputDevices.GetDevicesAtXRNode(XRNode.LeftHand, _devices);
-        device = _devices.FirstOrDefault();
-    }
-    private void OnEnable()
-    {
-        if (!device.isValid)
-        {
-            GetDevice();
-        }
-    }
-
+    
     private void Update()
     {
         if (isTranslating && _gizmo.gameObject.activeSelf)
         {
             Vector3 delta = transform.position - lastPosition;
+            //delta.x = delta.x * -1;
+            //delta.z = delta.z * -1;
+            //print(delta);
             lastPosition = transform.position;
             
             _gizmo.Translate(delta);
+            
         }
         
         
-        var leftHandDevices = new List<UnityEngine.XR.InputDevice>();
-        UnityEngine.XR.InputDevices.GetDevicesAtXRNode(UnityEngine.XR.XRNode.RightHand, leftHandDevices);
-
-        if(leftHandDevices.Count == 1)
-        {
-            UnityEngine.XR.InputDevice device = leftHandDevices[0];
-            Debug.Log(string.Format("Device name '{0}' with role '{1}'", device.name, device.role.ToString()));
-        }
-        else if(leftHandDevices.Count > 1)
-        {
-            Debug.Log("Found more than one left hand!");
-        }
-        
-        bool triggerValue;
-        if (device.TryGetFeatureValue(UnityEngine.XR.CommonUsages.triggerButton, out triggerValue) && triggerValue)
-        {
-            Debug.Log("Trigger button is pressed.");
-        }
     }
     
     void SelectTracker(AlignmentTracker tracker)
@@ -75,20 +47,51 @@ public class VRAligner : MonoBehaviour
         _gizmo.SetTrackerTarget(tracker);
     }
 
-    void GrabHoveredGizmo()
+    public void GrabHoveredGizmo()
     {
         if (HoveredHandle)
         {
             //We dont need to deselect because every selection overrides the active axis handle
+            //print("SelectHandle: " + HoveredHandle.gameObject.name);
             HoveredHandle.SelectHandle();
             isTranslating = true;
+            lastPosition = transform.position;
         }
-        
+    }
+
+    public void ReleaseGizmo()
+    {
+        isTranslating = false;
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        HoveredHandle = GetComponent<AlignmentGizmoHandle>();
-        print(HoveredHandle);
+        HoveredHandle = other.GetComponent<AlignmentGizmoHandle>();
+        //print("Hovered Handle" + HoveredHandle.gameObject.name);
+    }
+    
+    public void RaycastSelection()
+    {
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
+        Debug.DrawRay(transform.position,transform.forward,Color.red,10f);
+
+        foreach (RaycastHit hit in hits)
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            AlignmentTracker hitTracker = hitObject.GetComponent<AlignmentTracker>();
+            print("Raycasted");
+            print(hitTracker);
+
+            if (hitTracker)
+            {
+                _gizmo.SetTrackerTarget(hitTracker);
+                break;
+            }
+            else
+            {
+                _gizmo.ResetTrackerTarget();
+            }
+        }
     }
 }
