@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityEngine.XR.WSA;
 
 public class AlignmentGizmo : MonoBehaviour
 {
     [SerializeField]
     private bool[] _activeAxes = new bool[3];
-    private AlignmentTracker _targetTracker;
+    private AlignmentTracker[] _focusedTrackers;
     private bool _isPivotCenter = true;
     private AlignmentGizmoHandle[] _gizmoHandles;
 
@@ -58,34 +59,52 @@ public class AlignmentGizmo : MonoBehaviour
                 }
             }
         }
-
-        //print("Delta Vector:" + delta + "|| Direction Vector:" + directionVector);
-        delta = Vector3.Project(delta, directionVector);
-        //print(directionVector);
         
-        _targetTracker.transform.Translate(delta,Space.World);
-        //_targetTracker.transform.Translate(delta,Space.World);
+        delta = Vector3.Project(delta, directionVector);
+
+        foreach (AlignmentTracker focusedTracker in _focusedTrackers)
+        {
+            focusedTracker.transform.Translate(delta,Space.World);
+        }
+        
+        transform.Translate(delta,Space.World);
+        
         
     }
 
-    public void SetTrackerTarget(AlignmentTracker target)
+    public void SetTrackerTarget(AlignmentTracker[] selectionList)
     {
-        print("WE ARE SETTING THIS");
-        Vector3 location = target.transform.position;
-        if (_isPivotCenter)
-            location += target.GetRendererBounds().center;
-        transform.position = location;
-        transform.parent = target.transform;
+        //If no valid target reset selection
+        if (selectionList.Length < 1)
+        {
+            ResetTrackerTarget();
+            return;
+        }
 
+        Vector3 selectionCenter = Vector3.zero;
+        
+        foreach (AlignmentTracker tracker in selectionList)
+        {
+            Vector3 trackerCenter = tracker.transform.position;
+            if (_isPivotCenter)
+                trackerCenter += tracker.GetRendererBounds().center;
+            selectionCenter += trackerCenter;
+
+        }
+        
+
+        transform.position = selectionCenter;
         transform.localRotation = Quaternion.identity;
-        _targetTracker = target;
+        
+        //We dont use this
+        //_focusedTrackers = selectionList;
         
         gameObject.SetActive(true);
     }
 
     public void ResetTrackerTarget()
     {
-        _targetTracker = null;
+        _focusedTrackers = null;
         gameObject.SetActive(false);
     }
     
@@ -98,3 +117,5 @@ public class AlignmentGizmo : MonoBehaviour
 
     
 }
+
+

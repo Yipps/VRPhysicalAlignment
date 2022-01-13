@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.UI;
 
+
 [CreateAssetMenu(menuName = "PhysicalAlignmentData")]
 public class PhysicalAlignmentTool : ScriptableObject
 {
@@ -92,6 +93,7 @@ public class PhysicalAlignmentTool : ScriptableObject
                 //Set transforms
                 obj.transform.position = alignmentObject.position;
                 obj.transform.rotation = alignmentObject.rotation;
+                
             }
         }
         else

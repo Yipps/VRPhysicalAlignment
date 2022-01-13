@@ -7,6 +7,10 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/PhysicalAlignmentTool/Scripts/CommandManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../ClayxelVR/Assets/TimeMachine/Scripts/TMCommandHistory.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -21,6 +25,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="rider.run.widget.enabled.cache" value="false" />
+    <property name="settings.editor.selected.configurable" value="advanced.settings" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
   <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
@@ -59,6 +64,9 @@
       <workItem from="1641838042197" duration="3633000" />
       <workItem from="1641842121165" duration="10874000" />
       <workItem from="1641933336994" duration="3044000" />
+      <workItem from="1642042660530" duration="5837000" />
+      <workItem from="1642091285757" duration="2351000" />
+      <workItem from="1642094753936" duration="11792000" />
     </task>
     <servers />
   </component>

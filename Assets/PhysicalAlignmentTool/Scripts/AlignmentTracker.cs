@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using RotaryHeart.Lib.UnityGLDebug;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using Gizmos = Popcron.Gizmos;
 
 public class AlignmentTracker : MonoBehaviour
 {
@@ -35,6 +37,11 @@ public class AlignmentTracker : MonoBehaviour
                 Destroy(_runtimeCollider);
             Destroy(this);
         }
+    }
+
+    private void Update()
+    {
+        Gizmos.Cube(transform.position + renderBounds.center, transform.rotation,renderBounds.size, Color.black);
     }
 
 
