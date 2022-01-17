@@ -64,34 +64,57 @@ public class VRAligner : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         _hoveredHandle = other.GetComponent<AlignmentGizmoHandle>();
-        //print("Hovered Handle" + HoveredHandle.gameObject.name);
+        //print("Hovered Handle" + _hoveredHandle.gameObject.name);
     }
     
     private AlignmentTracker RaycastSelection()
     {
         RaycastHit[] hits;
+        
+        bool hasFoundTracker = false;
+        
         hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
         Debug.DrawRay(transform.position,transform.forward,Color.red,10f);
+
+        string debug = "Hits: " + hits.Length;
+        foreach (RaycastHit hit in hits)
+        {
+            debug += hit.collider.gameObject.name;
+        }
+
+        print(debug);
 
         AlignmentTracker hitTracker = null;
         foreach (RaycastHit hit in hits)
         {
             GameObject hitObject = hit.collider.gameObject;
             hitTracker = hitObject.GetComponent<AlignmentTracker>();
+            if (hitTracker!= null)
+            {
+                hasFoundTracker = true;
+                return hitTracker;
+            }
         }
+        print("Tracker Found: " + hasFoundTracker);
         
         return hitTracker;
     }
 
     public void SingleSelect()
     {
-        _selection.Clear();
-        
+        ClearSelection();
+        Debug.Log("SingleSelect");
         AlignmentTracker hit = RaycastSelection();
         if (hit)
         {
             _selection.Add(hit);
             _gizmo.SetTrackerTarget(_selection.ToArray());
+            print("Hilighting target");
+            hit.IsSelected = true;
+        }
+        else
+        {
+            
         }
     }
 
@@ -103,15 +126,27 @@ public class VRAligner : MonoBehaviour
         {
             if (_selection.Contains(hit))
             {
+                hit.IsSelected = false;
                 _selection.Remove(hit);
                 _gizmo.SetTrackerTarget(_selection.ToArray());
             }
             else
             {
+                hit.IsSelected = true;
                 _selection.Add(hit);
                 _gizmo.SetTrackerTarget(_selection.ToArray());
             }
         }
+    }
+
+    private void ClearSelection()
+    {
+        foreach (AlignmentTracker alignmentTracker in _selection)
+        {
+            alignmentTracker.IsSelected = false;
+        }
+        _selection.Clear();
+        _gizmo.SetTrackerTarget(_selection.ToArray());
     }
 
     private Vector3[] GetSelectionPositions()
@@ -124,6 +159,18 @@ public class VRAligner : MonoBehaviour
         }
 
         return locations;
+    }
+
+    public void UndoMovement()
+    {
+        print("Undo");
+        CommandManager.Undo();
+    }
+
+    public void RedoMovement()
+    {
+        print("Redo");
+        CommandManager.Redo();
     }
 }
 

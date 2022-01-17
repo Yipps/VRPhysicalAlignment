@@ -97,7 +97,7 @@ public class AlignmentGizmo : MonoBehaviour
         transform.localRotation = Quaternion.identity;
         
         //We dont use this
-        //_focusedTrackers = selectionList;
+        _focusedTrackers = selectionList;
         
         gameObject.SetActive(true);
     }

@@ -30,6 +30,6 @@ public class AlignmentToolManager : MonoBehaviour
 
     private void OnDisable()
     {
-        Save();
+
     }
 }

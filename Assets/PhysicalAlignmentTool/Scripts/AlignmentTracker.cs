@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
@@ -10,25 +11,54 @@ public class AlignmentTracker : MonoBehaviour
 {
     private bool _isMovable;
     private BoxCollider _runtimeCollider;
-    private PhysicalAlignmentTool physicalAlignmentTool;
-    private Bounds renderBounds;
+    private PhysicalAlignmentTool _physicalAlignmentTool;
+    private Bounds _renderBounds;
+
+    private GameObject _indicatorPrefab;
+    private Indicator _indicator;
+
+    private bool _isSelected;
+    private bool _isHovered;
+
+    public Vector3 scale;
+    
+    public bool IsHovered
+    {
+        get => _isHovered;
+        set
+        {
+            _isHovered = value;
+            _indicator.IsHovered = value;
+        }
+    }
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            _isSelected = value;
+            _indicator.IsSelected = value;
+        }
+    }
 
     void Start()
     {
-        physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
+        //Use resource load for builsd
+        _physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
         
         if (!GetComponent<Collider>())
         {
             //Make a min size for this if there are no renderers
             _runtimeCollider = gameObject.AddComponent<BoxCollider>();
 
-            renderBounds = CalculateBounds();
-            _runtimeCollider.size = renderBounds.size;
-            _runtimeCollider.center = renderBounds.center;
+            _renderBounds = CalculateBounds();
+            _runtimeCollider.size = _renderBounds.size;
+            _runtimeCollider.center = _renderBounds.center;
         }
         
         //Add self to alignmenttool list, if we fail delete this component
-        if (!physicalAlignmentTool.AddObject(gameObject))
+        if (!_physicalAlignmentTool.AddObject(gameObject))
         {
             Debug.LogError("Couldn't serialize tracker, deleting alignment tracker component");
             
@@ -36,11 +66,17 @@ public class AlignmentTracker : MonoBehaviour
                 Destroy(_runtimeCollider);
             Destroy(this);
         }
+
+        _indicatorPrefab = Resources.Load("AlignmentTool/Indicator") as GameObject;
+        GameObject indicatorGO = Instantiate(_indicatorPrefab, transform);
+        _indicator = indicatorGO.GetComponent<Indicator>();
+        _indicator.transform.localPosition = Vector3.zero;
+
     }
 
     private void Update()
     {
-        Gizmos.Cube(transform.position + renderBounds.center, transform.rotation,renderBounds.size, Color.black);
+        //Gizmos.Cube(transform.position + _renderBounds.center, transform.rotation,_renderBounds.size, Color.black);
     }
 
 
@@ -78,8 +114,19 @@ public class AlignmentTracker : MonoBehaviour
     private Bounds CalculateBounds()
     {
         Quaternion currentRotation = this.transform.rotation;
+        Vector3 currentScale = this.transform.localScale;
+        
         transform.rotation = Quaternion.Euler(0f,0f,0f);
- 
+        Vector3 inverse = transform.lossyScale;
+        inverse.x = 1 / inverse.x;
+        inverse.y = 1 / inverse.y;
+        inverse.z = 1 / inverse.z;
+
+        scale = transform.lossyScale;
+
+
+        transform.localScale = Vector3.Scale(transform.localScale,inverse);
+
         Bounds bounds = new Bounds(this.transform.position, Vector3.zero);
  
         foreach(Renderer renderer in GetComponentsInChildren<Renderer>())
@@ -88,15 +135,18 @@ public class AlignmentTracker : MonoBehaviour
         }
  
         Vector3 localCenter = bounds.center - this.transform.position;
+        Vector3 localScale = (transform.localScale * -1);
         bounds.center = localCenter;
+        bounds.size.Scale(localScale);
 
         transform.rotation = currentRotation;
+        transform.localScale = currentScale;
 
         return bounds;
     }
 
     public Bounds GetRendererBounds()
     {
-        return renderBounds;
+        return _renderBounds;
     }
 }

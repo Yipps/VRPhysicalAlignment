@@ -9,9 +9,9 @@ public static class CommandManager
 {
     //public static Stack<IAlignmentCommand> commands;
 
-    public static Stack<IAlignmentCommand> undoCommands;
+    public static Stack<IAlignmentCommand> undoCommands = new Stack<IAlignmentCommand>();
 
-    public static Stack<IAlignmentCommand> redoCommands;
+    public static Stack<IAlignmentCommand> redoCommands = new Stack<IAlignmentCommand>();
 
     public static void DoCommand(IAlignmentCommand command)
     {
@@ -22,7 +22,7 @@ public static class CommandManager
         redoCommands.Clear();
     }
 
-    static void Undo()
+    public static void Undo()
     {
         if (undoCommands.Count > 0)
         {
@@ -30,19 +30,26 @@ public static class CommandManager
             undoCommand.Undo();
             
             redoCommands.Push(undoCommand);
-            
+            DebugMe();
         }
     }
 
-    static void Redo()
+    public static void Redo()
     {
-        if (undoCommands.Count > 0)
+        if (redoCommands.Count > 0)
         {
             IAlignmentCommand redoCommand = redoCommands.Pop();
             redoCommand.Execute();
             
             undoCommands.Push(redoCommand);
+            DebugMe();
         }
+    }
+
+    private static void DebugMe()
+    {
+        Debug.Log("Undo Stack: " + undoCommands.Count);
+        Debug.Log("Redo Stack " + redoCommands.Count);
     }
     
 

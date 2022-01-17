@@ -230,7 +230,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2294864824873389549}
-        m_MethodName: RaycastSelection
+        m_MethodName: SingleSelect
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -285,7 +285,18 @@ MonoBehaviour:
       m_Calls: []
   OnPrimaryButtonPress:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 2294864824873389549}
+        m_MethodName: ToggleSelect
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnPrimaryButtonRelease:
     m_PersistentCalls:
       m_Calls: []
@@ -540,7 +551,7 @@ GameObject:
   - component: {fileID: 2294864824873389548}
   - component: {fileID: 2294864824873389549}
   m_Layer: 0
-  m_Name: RightAligner
+  m_Name: PrimaryAligner
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -43,5 +43,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 078ed2472c32dca4c8e8b5cc779978e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  physicalAlignmentTool: {fileID: 11400000, guid: 6cad5b6204eceef4e9dbb3c6d4e1b579,
-    type: 2}
+  indicator: {fileID: 856695425296527916, guid: 0a742445353b0094e838c955833939a8,
+    type: 3}
