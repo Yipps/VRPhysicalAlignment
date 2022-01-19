@@ -2,18 +2,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 using UnityTemplateProjects;
 
 public class Indicator : MonoBehaviour
 {
     [SerializeField]
-    private Color selected;
+    private Color selectedColor;
     [SerializeField]
-    private Color unselected;
+    private Color unselectedColor;
     [SerializeField]
-    private Color focused;
+    private Color parentSelectedColor;
     [SerializeField] 
-    private Color hovered;
+    private Color hoveredColor;
     
     private Camera _cam;
     
@@ -21,27 +22,60 @@ public class Indicator : MonoBehaviour
     private GameObject target;
 
     private bool _isSelected;
-
     public bool IsSelected
     {
         get => _isSelected;
         set
         {
             _isSelected = value;
-            GetComponent<SpriteRenderer>().color = value ? selected : unselected;
+            UpdateColor();
         }
     }
-
+    
     private bool _IsHovered;
-
     public bool IsHovered
     {
         get => _IsHovered;
         set
         {
-            Color current = _isSelected ? selected : unselected;
-            GetComponent<SpriteRenderer>().color = value ? hovered : current;
+            _IsHovered = value;
+            UpdateColor();
         }
+    }
+
+    private bool _isParentSelected;
+    public bool IsParentSelected
+    {
+        get => _isParentSelected;
+        set
+        {
+            _isParentSelected = value;
+            UpdateColor();
+        }
+    }
+
+    private void UpdateColor()
+    {
+        //Color priority
+        //Hover > Selected > Parent Selected > unselected
+        //
+        Color color = unselectedColor;
+
+        if (IsHovered)
+        {
+            color = hoveredColor;
+        }
+        else if (IsSelected)
+        {
+            color = selectedColor;
+        }
+        else if (IsParentSelected)
+        {
+            color = parentSelectedColor;
+        }
+
+        GetComponent<SpriteRenderer>().color = color;
+
     }
 
     private void Start()

@@ -44,10 +44,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23492206d0019d543b4243de8cc9aff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selected: {r: 1, g: 0.52494174, b: 0, a: 1}
-  unselected: {r: 0.7830189, g: 0.7830189, b: 0.7830189, a: 1}
-  focused: {r: 1, g: 0.8378445, b: 0, a: 1}
-  hovered: {r: 0.495283, g: 0.6228432, b: 1, a: 1}
+  selectedColor: {r: 1, g: 0.5013487, b: 0, a: 1}
+  unselectedColor: {r: 1, g: 1, b: 1, a: 1}
+  parentSelectedColor: {r: 1, g: 0.7516509, b: 0.4481132, a: 1}
+  hoveredColor: {r: 0.4669811, g: 0.56635284, b: 1, a: 1}
   target: {fileID: 0}
 --- !u!212 &1728346987961739946
 SpriteRenderer:

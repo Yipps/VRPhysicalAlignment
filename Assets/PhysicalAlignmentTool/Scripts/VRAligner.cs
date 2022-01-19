@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.XR;
 
@@ -19,6 +20,8 @@ public class VRAligner : MonoBehaviour
     
     //Ontrigger enter updated
     private AlignmentGizmoHandle _hoveredHandle;
+
+    private AlignmentTracker _hoveredTracker;
     
     //Pass aligner pos delta to gizmo
     private bool _isTranslating;
@@ -33,10 +36,42 @@ public class VRAligner : MonoBehaviour
             _gizmo.Translate(delta);
             
             _alignerLastPos = transform.position;
-            
         }
+        
+        //Raycast UI
+        RaycastUI();
     }
 
+    private void RaycastUI()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 20f))
+        {
+            VRButton button = hit.collider.gameObject.GetComponent<VRButton>();
+
+            if (button)
+                button.Select();
+        }
+
+        Debug.DrawRay(transform.position, transform.forward, Color.red);
+        //if (Physics.Raycast(transform.position, transform.forward, out hit, 10f, ))
+    }
+
+    public void RaycastUIPress()
+    {
+        RaycastHit hit;
+
+        if (Physics.Raycast(transform.position, transform.forward, out hit, 20f))
+        {
+            VRButton button = hit.collider.gameObject.GetComponent<VRButton>();
+
+            if (button)
+                button.Press();
+        }
+
+        Debug.DrawRay(transform.position, transform.forward, Color.red);
+    }
     public void GrabHoveredGizmo()
     {
         if (_hoveredHandle)
@@ -64,9 +99,39 @@ public class VRAligner : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         _hoveredHandle = other.GetComponent<AlignmentGizmoHandle>();
+
+        AlignmentTracker otherTracker = other.GetComponent<AlignmentTracker>();
+        
+        if (_hoveredTracker != otherTracker)
+        {
+            //print("FoundTrigger");
+            if (_hoveredTracker)
+                _hoveredTracker.IsHovered = false;
+            
+            _hoveredTracker = otherTracker;
+        
+            if (_hoveredTracker)
+            {
+                _hoveredTracker.IsHovered = true;
+                print("Color true");
+            }
+        }
+
         //print("Hovered Handle" + _hoveredHandle.gameObject.name);
     }
-    
+
+    private void OnTriggerExit(Collider other)
+    {
+        AlignmentTracker otherTracker = other.GetComponent<AlignmentTracker>();
+
+        if (_hoveredTracker && _hoveredTracker == otherTracker)
+        {
+            _hoveredTracker.IsHovered = false;
+            _hoveredTracker = null;
+        }
+            
+    }
+
     private AlignmentTracker RaycastSelection()
     {
         RaycastHit[] hits;
@@ -76,15 +141,87 @@ public class VRAligner : MonoBehaviour
         hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
         Debug.DrawRay(transform.position,transform.forward,Color.red,10f);
 
-        string debug = "Hits: " + hits.Length;
-        foreach (RaycastHit hit in hits)
-        {
-            debug += hit.collider.gameObject.name;
-        }
-
-        print(debug);
+        // string debug = "Hits: " + hits.Length;
+        // foreach (RaycastHit hit in hits)
+        // {
+        //     debug += hit.collider.gameObject.name;
+        // }
+        //
+        // print(debug);
 
         AlignmentTracker hitTracker = null;
+        foreach (RaycastHit hit in hits)
+        {
+            GameObject hitObject = hit.collider.gameObject;
+            hitTracker = hitObject.GetComponent<AlignmentTracker>();
+            if (hitTracker!= null)
+            {
+                //Found a tracker
+                hasFoundTracker = true;
+                return hitTracker;
+            }
+        }
+        print("Tracker Found: " + hasFoundTracker);
+        
+        return hitTracker;
+    }
+    
+    private AlignmentTracker RaycastSelection(bool findNew)
+    {
+        RaycastHit[] hits;
+        
+        bool hasFoundTracker = false;
+        
+        hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
+        Debug.DrawRay(transform.position,transform.forward,Color.red,10f);
+
+        // string debug = "Hits: " + hits.Length;
+        // foreach (RaycastHit hit in hits)
+        // {
+        //     debug += hit.collider.gameObject.name;
+        // }
+        //
+        // print(debug);
+
+        AlignmentTracker hitTracker = null;
+        foreach (RaycastHit hit in hits)
+        {
+            //Check for tracker, continue if not found
+            GameObject hitObject = hit.collider.gameObject;
+            hitTracker = hitObject.GetComponent<AlignmentTracker>();
+            if (hitTracker == null) continue;
+            
+            if (findNew)
+            {
+                //Check if tracker is new
+                if (!_selection.Contains(hitTracker))
+                {
+                    //If we find a new tracker immediately return it
+                    return hitTracker;
+                }
+                //If tracker isn't new, set it to null and keep looking
+                hitTracker = null;
+            }
+            else
+            {
+                //Not looking for a unique tracker, return immediately 
+                return hitTracker;
+            }
+
+        }
+        return hitTracker;
+    }
+    
+    private AlignmentTracker RaycastSelection(AlignmentTracker[] currentSelection)
+    {
+        RaycastHit[] hits;
+        
+        bool hasFoundTracker = false;
+        
+        hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
+
+        AlignmentTracker hitTracker = null;
+        
         foreach (RaycastHit hit in hits)
         {
             GameObject hitObject = hit.collider.gameObject;
@@ -95,16 +232,16 @@ public class VRAligner : MonoBehaviour
                 return hitTracker;
             }
         }
-        print("Tracker Found: " + hasFoundTracker);
-        
+
         return hitTracker;
     }
 
     public void SingleSelect()
     {
-        ClearSelection();
+        
         Debug.Log("SingleSelect");
-        AlignmentTracker hit = RaycastSelection();
+        AlignmentTracker hit = RaycastSelection(true);
+        ClearSelection();
         if (hit)
         {
             _selection.Add(hit);

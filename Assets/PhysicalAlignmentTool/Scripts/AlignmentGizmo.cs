@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UIElements;
 using UnityEngine.XR.WSA;
@@ -89,9 +90,8 @@ public class AlignmentGizmo : MonoBehaviour
             if (_isPivotCenter)
                 trackerCenter += tracker.GetRendererBounds().center;
             selectionCenter += trackerCenter;
-
         }
-        
+        selectionCenter /= selectionList.Length;
 
         transform.position = selectionCenter;
         transform.localRotation = Quaternion.identity;

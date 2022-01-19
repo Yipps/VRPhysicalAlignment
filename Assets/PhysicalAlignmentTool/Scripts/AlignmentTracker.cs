@@ -19,6 +19,17 @@ public class AlignmentTracker : MonoBehaviour
 
     private bool _isSelected;
     private bool _isHovered;
+    private bool _isParentSelected;
+
+    public bool IsParentSelected
+    {
+        get => _isParentSelected;
+        set
+        {
+            _isParentSelected = value;
+            _indicator.IsParentSelected = value;
+        }
+    }
 
     public Vector3 scale;
     
@@ -39,8 +50,18 @@ public class AlignmentTracker : MonoBehaviour
         {
             _isSelected = value;
             _indicator.IsSelected = value;
+            
+            AlignmentTracker[] children =GetComponentsInChildren<AlignmentTracker>();
+            foreach (AlignmentTracker tracker in children)
+            {
+                if (tracker != this)
+                {
+                    tracker.IsParentSelected = value;
+                }
+            }
         }
     }
+    
 
     void Start()
     {
@@ -51,6 +72,7 @@ public class AlignmentTracker : MonoBehaviour
         {
             //Make a min size for this if there are no renderers
             _runtimeCollider = gameObject.AddComponent<BoxCollider>();
+            _runtimeCollider.isTrigger = true;
 
             _renderBounds = CalculateBounds();
             _runtimeCollider.size = _renderBounds.size;
