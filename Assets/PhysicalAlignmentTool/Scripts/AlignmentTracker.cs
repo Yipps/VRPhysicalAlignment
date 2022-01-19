@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using Gizmos = Popcron.Gizmos;
 
 public class AlignmentTracker : MonoBehaviour
 {
