@@ -44,14 +44,18 @@ public class VRAligner : MonoBehaviour
 
     private void RaycastUI()
     {
-        RaycastHit hit;
+        RaycastHit[] hits;
+        hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
 
-        if (Physics.Raycast(transform.position, transform.forward, out hit, 20f))
+        foreach (RaycastHit hit in hits)
         {
             VRButton button = hit.collider.gameObject.GetComponent<VRButton>();
-
             if (button)
+            {
                 button.Select();
+                print("Select");
+            }
+                
         }
 
         Debug.DrawRay(transform.position, transform.forward, Color.red);
@@ -308,6 +312,11 @@ public class VRAligner : MonoBehaviour
     {
         print("Redo");
         CommandManager.Redo();
+    }
+
+    public void TakeGizmo()
+    {
+        _gizmo.PlaceGizmo(transform.position);
     }
 }
 

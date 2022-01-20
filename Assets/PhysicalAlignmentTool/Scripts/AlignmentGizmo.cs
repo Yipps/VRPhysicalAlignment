@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UIElements;
-using UnityEngine.XR.WSA;
 
 public class AlignmentGizmo : MonoBehaviour
 {
@@ -81,23 +78,9 @@ public class AlignmentGizmo : MonoBehaviour
             ResetTrackerTarget();
             return;
         }
-
-        Vector3 selectionCenter = Vector3.zero;
         
-        foreach (AlignmentTracker tracker in selectionList)
-        {
-            Vector3 trackerCenter = tracker.transform.position;
-            if (_isPivotCenter)
-                trackerCenter += tracker.GetRendererBounds().center;
-            selectionCenter += trackerCenter;
-        }
-        selectionCenter /= selectionList.Length;
-
-        transform.position = selectionCenter;
-        transform.localRotation = Quaternion.identity;
-        
-        //We dont use this
         _focusedTrackers = selectionList;
+        RecenterGizmo();
         
         gameObject.SetActive(true);
     }
@@ -112,6 +95,27 @@ public class AlignmentGizmo : MonoBehaviour
     {
         _activeAxes = axes;
         print("Set axis:" + _activeAxes);
+    }
+
+    public void RecenterGizmo()
+    {
+        Vector3 selectionCenter = Vector3.zero;
+        foreach (AlignmentTracker tracker in _focusedTrackers)
+        {
+            Vector3 trackerCenter = tracker.transform.position;
+
+            trackerCenter += tracker.transform.InverseTransformVector(tracker.GetRendererBounds().center);
+            
+            selectionCenter += trackerCenter;
+        }
+        selectionCenter /= _focusedTrackers.Length;
+        transform.position = selectionCenter;
+        transform.localRotation = Quaternion.identity;
+    }
+
+    public void PlaceGizmo(Vector3 position)
+    {
+        transform.position = position;
     }
 
 

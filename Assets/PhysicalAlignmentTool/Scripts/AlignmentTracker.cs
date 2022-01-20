@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEngine;
-using Gizmos = Popcron.Gizmos;
 
 public class AlignmentTracker : MonoBehaviour
 {
@@ -66,7 +64,8 @@ public class AlignmentTracker : MonoBehaviour
     void Start()
     {
         //Use resource load for builsd
-        _physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
+        //_physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
+        _physicalAlignmentTool = Resources.Load("AlignmentTool/PhysicalAlignmentTool") as PhysicalAlignmentTool;
         
         if (!GetComponent<Collider>())
         {
@@ -92,13 +91,19 @@ public class AlignmentTracker : MonoBehaviour
         _indicatorPrefab = Resources.Load("AlignmentTool/Indicator") as GameObject;
         GameObject indicatorGO = Instantiate(_indicatorPrefab, transform);
         _indicator = indicatorGO.GetComponent<Indicator>();
-        _indicator.transform.localPosition = Vector3.zero;
+        _indicator.transform.localPosition = _renderBounds.center;
 
     }
 
     private void Update()
     {
         //Gizmos.Cube(transform.position + _renderBounds.center, transform.rotation,_renderBounds.size, Color.black);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1f, .6f, 0f);
+        Gizmos.DrawWireCube(transform.position + transform.InverseTransformVector(_renderBounds.center), _renderBounds.size);
     }
 
 
