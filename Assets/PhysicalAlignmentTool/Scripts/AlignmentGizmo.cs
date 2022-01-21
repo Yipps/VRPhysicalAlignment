@@ -2,21 +2,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using Drawing;
 public class AlignmentGizmo : MonoBehaviour
 {
-    [SerializeField]
-    private bool[] _activeAxes = new bool[3];
+    //[SerializeField]
+    private Vector3 _activeDirection;
     private AlignmentTracker[] _focusedTrackers;
     private bool _isPivotCenter = true;
     private AlignmentGizmoHandle[] _gizmoHandles;
+
+    private bool _isMoving;
+    
+    private bool _isLocked;
+    private Vector3 _startPos;
+    private Vector3 _deltaSum;
 
     private void OnEnable()
     {
         _gizmoHandles = GetComponentsInChildren<AlignmentGizmoHandle>();
         foreach (AlignmentGizmoHandle alignmentGizmoHandle in _gizmoHandles)
         {
-            alignmentGizmoHandle.OnHandleSelected += SetAxes;
+            alignmentGizmoHandle.onHandleSelected += StartMove;
+            alignmentGizmoHandle.onHandleDeselected += EndMove;
         }
         
         //gameObject.SetActive((false));
@@ -26,49 +33,58 @@ public class AlignmentGizmo : MonoBehaviour
     {
         foreach (AlignmentGizmoHandle alignmentGizmoHandle in _gizmoHandles)
         {
-            alignmentGizmoHandle.OnHandleSelected -= SetAxes;
+            alignmentGizmoHandle.onHandleSelected -= StartMove;
         }
     }
 
-    // Start is called before the first frame update
+    private void Update()
+    {
+        DrawGUI();
+    }
+
     public void Translate(Vector3 delta)
     {
-        //zero out any unactive axis
-        
-        Vector3 directionVector = Vector3.zero;
-        for (int i = 0; i < 3; i++)
-        {
-            // if (!_activeAxes[i])
-            //     delta[i] = 0;
-            if (_activeAxes[i])
-            {
-                if (i == 0)
-                {
-                    directionVector = transform.right;
-                    print("(x) Forward " + directionVector);
-                }else if (i == 1)
-                {
-                    directionVector = transform.up;
-                    print("(y) Up " + directionVector);
-                }else if (i == 2)
-                {
-                    directionVector = transform.forward;
-                    print("(z) Forward " + directionVector);
-                }
-            }
-        }
-        
-        delta = Vector3.Project(delta, directionVector);
+
+        delta = Vector3.Project(delta, _activeDirection);
 
         foreach (AlignmentTracker focusedTracker in _focusedTrackers)
         {
             focusedTracker.transform.Translate(delta,Space.World);
         }
         
-        transform.Translate(delta,Space.World);
-        
-        
+        if(!_isLocked)
+            transform.Translate(delta,Space.World);
+        _deltaSum += delta;
+
     }
+
+    // private Vector3 GetAxisDirection()
+    // {
+    //     Vector3 directionVector = Vector3.zero;
+    //     for (int i = 0; i < 3; i++)
+    //     {
+    //         if (_activeDirection[i])
+    //         {
+    //             if (i == 0)
+    //             {
+    //                 directionVector = transform.right;
+    //                 print("(x) Forward " + directionVector);
+    //             }
+    //             else if (i == 1)
+    //             {
+    //                 directionVector = transform.up;
+    //                 print("(y) Up " + directionVector);
+    //             }
+    //             else if (i == 2)
+    //             {
+    //                 directionVector = transform.forward;
+    //                 print("(z) Forward " + directionVector);
+    //             }
+    //         }
+    //     }
+    //
+    //     return directionVector;
+    // }
 
     public void SetTrackerTarget(AlignmentTracker[] selectionList)
     {
@@ -91,10 +107,19 @@ public class AlignmentGizmo : MonoBehaviour
         gameObject.SetActive(false);
     }
     
-    private void SetAxes(bool[] axes)
+    private void StartMove(Vector3 dir)
     {
-        _activeAxes = axes;
-        print("Set axis:" + _activeAxes);
+        _activeDirection = dir;
+        _startPos = transform.position;
+
+        _isMoving = true;
+        print("Set axis:" + _activeDirection);
+    }
+
+    private void EndMove()
+    {
+        _deltaSum = Vector3.zero;
+        _isMoving = false;
     }
 
     public void RecenterGizmo()
@@ -116,6 +141,19 @@ public class AlignmentGizmo : MonoBehaviour
     public void PlaceGizmo(Vector3 position)
     {
         transform.position = position;
+    }
+
+    private void DrawGUI()
+    {
+        if (_isMoving)
+        {
+            //Vector3 deltaPos = Vector3.Scale(_deltaSum, _activeDirection);
+
+            Draw.Line(_startPos, _startPos + _deltaSum, Color.blue);
+
+            Vector3 spherePos = _isLocked ? _startPos + _deltaSum : _startPos;
+            Draw.WireSphere(spherePos, .1f);
+        }
     }
 
 

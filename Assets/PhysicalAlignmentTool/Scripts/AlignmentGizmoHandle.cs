@@ -3,24 +3,73 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Drawing;
+using TMPro.EditorUtilities;
 
 public class AlignmentGizmoHandle : MonoBehaviour
 {
+    //[SerializeField] 
+    //private bool[] axesIndicator = new bool[3];
     [SerializeField] 
-    private bool[] axesIndicator = new bool[3];
+    private float axisLength = 10f;
     private AlignmentGizmo _gizmo;
+    private bool _showAxis;
+    private bool _isHovered;
 
-    public UnityAction<bool[]> OnHandleSelected;
-    // Start is called before the first frame update
+    public UnityAction<Vector3> onHandleSelected;
+    public UnityAction onHandleDeselected;
+    
+    
+
 
     private void Start()
     {
         _gizmo = GetComponentInParent<AlignmentGizmo>();
     }
 
+    private void Update()
+    {
+        DrawHandleGUI();
+    }
+
     public void SelectHandle()
     {
-        OnHandleSelected(axesIndicator);
+        onHandleSelected(transform.forward);
+        _showAxis = true;
     }
-    
+
+    public void DeselectHandle()
+    {
+        onHandleDeselected();
+        _showAxis = false;
+    }
+
+    private void DrawHandleGUI()
+    {
+        if (_showAxis||_isHovered)
+
+        {
+            Vector3 start = transform.position + (transform.forward * axisLength);
+            Vector3 end = transform.position + (-transform.forward * axisLength);
+            Draw.Line(start,end);
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        VRAligner aligner = other.GetComponent<VRAligner>();
+        if (aligner)
+        {
+            _isHovered = true;
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        VRAligner aligner = other.GetComponent<VRAligner>();
+        if (aligner)
+        {
+            _isHovered = false;
+        }
+    }
 }

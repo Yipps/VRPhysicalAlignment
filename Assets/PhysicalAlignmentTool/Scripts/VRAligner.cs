@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using UnityEngine.XR;
+
 
 public class VRAligner : MonoBehaviour
 {
@@ -26,6 +22,7 @@ public class VRAligner : MonoBehaviour
     //Pass aligner pos delta to gizmo
     private bool _isTranslating;
     private Vector3 _alignerLastPos;
+    private float _moveSpeed = 1f;
 
     private void Update()
     {
@@ -33,7 +30,7 @@ public class VRAligner : MonoBehaviour
         {
             Vector3 delta = transform.position - _alignerLastPos;
 
-            _gizmo.Translate(delta);
+            _gizmo.Translate(delta * _moveSpeed);
             
             _alignerLastPos = transform.position;
         }
@@ -93,6 +90,7 @@ public class VRAligner : MonoBehaviour
     public void ReleaseGizmo()
     {
         _isTranslating = false;
+        _hoveredHandle.DeselectHandle();
         
         //Undo/Redo Command
         Vector3[] selectionCurrentPosition = GetSelectionPositions();
@@ -317,6 +315,18 @@ public class VRAligner : MonoBehaviour
     public void TakeGizmo()
     {
         _gizmo.PlaceGizmo(transform.position);
+    }
+
+    public void IncrementMoveSpeed()
+    {
+        _moveSpeed += 0.1f;
+        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 2f);
+    }
+
+    public void DecrementMoveSpeed()
+    {
+        _moveSpeed -= 0.1f;
+        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 2f);
     }
 }
 
