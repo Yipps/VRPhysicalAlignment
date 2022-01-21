@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEditor;
 using UnityEngine;
+using Drawing;
+using Unity.Mathematics;
+using UnityEngine.UIElements;
 
 public class AlignmentTracker : MonoBehaviour
 {
@@ -13,11 +16,20 @@ public class AlignmentTracker : MonoBehaviour
     private Bounds _renderBounds;
 
     private GameObject _indicatorPrefab;
-    private Indicator _indicator;
+    //private Indicator _indicator;
 
     private bool _isSelected;
     private bool _isHovered;
     private bool _isParentSelected;
+
+    private AlignmentTracker _parentTracker;
+    private bool _hasChildTrackers;
+
+    //GUI Drawing
+    private Color _boundColor = Color.white;
+    private float _boundWidth = 1f;
+    private float _boundDefaultWidth = 1f;
+    
 
     public bool IsParentSelected
     {
@@ -25,7 +37,8 @@ public class AlignmentTracker : MonoBehaviour
         set
         {
             _isParentSelected = value;
-            _indicator.IsParentSelected = value;
+            //_indicator.IsParentSelected = value;
+            UpdateGUIData();
         }
     }
 
@@ -37,7 +50,7 @@ public class AlignmentTracker : MonoBehaviour
         set
         {
             _isHovered = value;
-            _indicator.IsHovered = value;
+            //_indicator.IsHovered = value;
         }
     }
 
@@ -47,7 +60,7 @@ public class AlignmentTracker : MonoBehaviour
         set
         {
             _isSelected = value;
-            _indicator.IsSelected = value;
+            //_indicator.IsSelected = value;
             
             AlignmentTracker[] children =GetComponentsInChildren<AlignmentTracker>();
             foreach (AlignmentTracker tracker in children)
@@ -57,15 +70,25 @@ public class AlignmentTracker : MonoBehaviour
                     tracker.IsParentSelected = value;
                 }
             }
+            
+            UpdateGUIData();
         }
     }
     
 
     void Start()
     {
-        //Use resource load for builsd
-        //_physicalAlignmentTool = (PhysicalAlignmentTool)AssetDatabase.LoadAssetAtPath("Assets/PhysicalAlignmentTool/Scripts/PhysicalAlignmentTool.asset",typeof(PhysicalAlignmentTool));
+
         _physicalAlignmentTool = Resources.Load("AlignmentTool/PhysicalAlignmentTool") as PhysicalAlignmentTool;
+
+        //Flag if we have parents
+        if(transform.parent)
+        {
+            _parentTracker = transform.parent.GetComponentInParent<AlignmentTracker>();
+            _boundDefaultWidth = 1.5f;
+        }
+        // if (GetComponentsInChildren<AlignmentTracker>().Length > 1)
+        //     _hasChildTrackers = true;
         
         if (!GetComponent<Collider>())
         {
@@ -90,22 +113,15 @@ public class AlignmentTracker : MonoBehaviour
 
         _indicatorPrefab = Resources.Load("AlignmentTool/Indicator") as GameObject;
         GameObject indicatorGO = Instantiate(_indicatorPrefab, transform);
-        _indicator = indicatorGO.GetComponent<Indicator>();
-        _indicator.transform.localPosition = _renderBounds.center;
+        //_indicator = indicatorGO.GetComponent<Indicator>();
+        //_indicator.transform.localPosition = _renderBounds.center;
 
     }
 
     private void Update()
     {
-        //Gizmos.Cube(transform.position + _renderBounds.center, transform.rotation,_renderBounds.size, Color.black);
+        DrawBoundsGUI();
     }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = new Color(1f, .6f, 0f);
-        Gizmos.DrawWireCube(transform.position + transform.InverseTransformVector(_renderBounds.center), _renderBounds.size);
-    }
-
 
     // private void CalculateBounds()
     // {
@@ -175,5 +191,46 @@ public class AlignmentTracker : MonoBehaviour
     public Bounds GetRendererBounds()
     {
         return _renderBounds;
+    }
+
+    private void DrawBoundsGUI()
+    {
+        Camera cam = Camera.current;
+
+        using (Draw.ingame.InLocalSpace(transform))
+        {
+            using (Draw.ingame.WithLineWidth(_boundWidth))
+            {
+                Draw.ingame.WireBox(_renderBounds.center, _renderBounds.size, _boundColor);
+            }
+        }
+
+        //If we need to draw in worldspace
+        Vector3 worldBoundsCenter = transform.position + transform.TransformVector(_renderBounds.center);
+        
+        Draw.ingame.SolidBox(worldBoundsCenter,new Vector3(0.01f,0.01f,0.01f),_boundColor);
+        //Show parent
+        if (_parentTracker && IsSelected)
+        {
+            Draw.ingame.Line(transform.position, _parentTracker.transform.position);
+        }
+    }
+
+    private void UpdateGUIData()
+    {
+        if (_isSelected)
+        {
+            _boundColor = new Color(0.5f, 1f, 1f);
+            _boundWidth = 2f;
+        }else if (_isParentSelected)
+        {
+            _boundColor = new Color(0f, 0f, 1f);
+            _boundWidth = 1.5f;
+        }
+        else
+        {
+            _boundColor = new Color(1f, 1f, 1f);
+            _boundWidth = 1f;
+        }
     }
 }

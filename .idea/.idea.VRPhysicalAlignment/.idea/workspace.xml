@@ -16,8 +16,8 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/../ClayxelVR/Assets/TimeMachine/Scripts/TMCommandHistory.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/PhysicalAlignmentTool/Scripts/CommandManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/../ClayxelVR/Assets/TimeMachine/Scripts/TMCommandHistory.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -77,6 +77,8 @@
       <workItem from="1642094753936" duration="13201000" />
       <workItem from="1642188399546" duration="946000" />
       <workItem from="1642426465762" duration="16349000" />
+      <workItem from="1642722090502" duration="1277000" />
+      <workItem from="1642786953428" duration="7856000" />
     </task>
     <servers />
   </component>
