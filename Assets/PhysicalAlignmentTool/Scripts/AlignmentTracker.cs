@@ -1,22 +1,22 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using UnityEditor;
-using UnityEngine;
+﻿using UnityEngine;
 using Drawing;
-using Unity.Mathematics;
-using UnityEngine.UIElements;
+
 
 public class AlignmentTracker : MonoBehaviour
 {
-    private bool _isMovable;
+    public static bool IsLockedView;
+    
+    
     private BoxCollider _runtimeCollider;
     private PhysicalAlignmentTool _physicalAlignmentTool;
     private Bounds _renderBounds;
 
     private GameObject _indicatorPrefab;
     //private Indicator _indicator;
+
+    private bool _isLocked;
+
+
 
     private bool _isSelected;
     private bool _isHovered;
@@ -30,7 +30,12 @@ public class AlignmentTracker : MonoBehaviour
     private float _boundWidth = 1f;
     private float _boundDefaultWidth = 1f;
     
-
+    public bool IsLocked
+    {
+        get => _isLocked;
+        set => _isLocked = value;
+    }
+    
     public bool IsParentSelected
     {
         get => _isParentSelected;
@@ -111,8 +116,8 @@ public class AlignmentTracker : MonoBehaviour
             Destroy(this);
         }
 
-        _indicatorPrefab = Resources.Load("AlignmentTool/Indicator") as GameObject;
-        GameObject indicatorGO = Instantiate(_indicatorPrefab, transform);
+        //_indicatorPrefab = Resources.Load("AlignmentTool/Indicator") as GameObject;
+        //GameObject indicatorGO = Instantiate(_indicatorPrefab, transform);
         //_indicator = indicatorGO.GetComponent<Indicator>();
         //_indicator.transform.localPosition = _renderBounds.center;
 
@@ -123,6 +128,10 @@ public class AlignmentTracker : MonoBehaviour
         DrawBoundsGUI();
     }
 
+    public static void ToggleLockView()
+    {
+        IsLockedView = !IsLockedView;
+    }
     // private void CalculateBounds()
     // {
     //     //Renderer[] renderers = GetComponentsInChildren<Renderer>();
@@ -195,25 +204,49 @@ public class AlignmentTracker : MonoBehaviour
 
     private void DrawBoundsGUI()
     {
-        Camera cam = Camera.current;
 
-        using (Draw.ingame.InLocalSpace(transform))
+        if (_isLocked && IsLockedView)
         {
-            using (Draw.ingame.WithLineWidth(_boundWidth))
+
+            using (Draw.ingame.InLocalSpace(transform))
             {
-                Draw.ingame.WireBox(_renderBounds.center, _renderBounds.size, _boundColor);
+                using (Draw.ingame.WithLineWidth(_boundWidth))
+                {
+                    Draw.ingame.WireBox(_renderBounds.center, _renderBounds.size, Color.red);
+                }
+            }
+
+            //If we need to draw in worldspace
+            Vector3 worldBoundsCenter = transform.position + transform.TransformVector(_renderBounds.center);
+
+            Draw.ingame.SolidBox(worldBoundsCenter, new Vector3(0.01f, 0.01f, 0.01f), Color.red);
+            //Show parent
+            if (_parentTracker && IsSelected)
+            {
+                Draw.ingame.Line(transform.position, _parentTracker.transform.position);
+            }
+        }else if (!_isLocked)
+        {
+            using (Draw.ingame.InLocalSpace(transform))
+            {
+                using (Draw.ingame.WithLineWidth(_boundWidth))
+                {
+                    Draw.ingame.WireBox(_renderBounds.center, _renderBounds.size, _boundColor);
+                }
+            }
+
+            //If we need to draw in worldspace
+            Vector3 worldBoundsCenter = transform.position + transform.TransformVector(_renderBounds.center);
+
+            Draw.ingame.SolidBox(worldBoundsCenter, new Vector3(0.01f, 0.01f, 0.01f), _boundColor);
+            //Show parent
+            if (_parentTracker && IsSelected)
+            {
+                Draw.ingame.Line(transform.position, _parentTracker.transform.position);
             }
         }
-
-        //If we need to draw in worldspace
-        Vector3 worldBoundsCenter = transform.position + transform.TransformVector(_renderBounds.center);
         
-        Draw.ingame.SolidBox(worldBoundsCenter,new Vector3(0.01f,0.01f,0.01f),_boundColor);
-        //Show parent
-        if (_parentTracker && IsSelected)
-        {
-            Draw.ingame.Line(transform.position, _parentTracker.transform.position);
-        }
+        
     }
 
     private void UpdateGUIData()

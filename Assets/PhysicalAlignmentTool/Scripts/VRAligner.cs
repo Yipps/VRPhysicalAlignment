@@ -10,7 +10,7 @@ public class VRAligner : MonoBehaviour
     [SerializeField]
     private AlignmentGizmo _gizmo;
 
-    private List<AlignmentTracker> _selection = new List<AlignmentTracker>();
+    private static List<AlignmentTracker> _selection = new List<AlignmentTracker>();
     
     //Undo/Redo data
     private Vector3[] _initSelectionLocations;
@@ -40,6 +40,7 @@ public class VRAligner : MonoBehaviour
         //Raycast UI
         RaycastUI();
         DrawGUI();
+        print(_selection.Count);
     }
 
     private void RaycastUI()
@@ -147,35 +148,36 @@ public class VRAligner : MonoBehaviour
     private AlignmentTracker RaycastSelection()
     {
         RaycastHit[] hits;
-        
-        bool hasFoundTracker = false;
-        
+
         hits = Physics.RaycastAll(transform.position, transform.forward, 10f);
-        Debug.DrawRay(transform.position,transform.forward,Color.red,10f);
-
-        // string debug = "Hits: " + hits.Length;
-        // foreach (RaycastHit hit in hits)
-        // {
-        //     debug += hit.collider.gameObject.name;
-        // }
-        //
-        // print(debug);
-
         AlignmentTracker hitTracker = null;
+        
         foreach (RaycastHit hit in hits)
         {
             GameObject hitObject = hit.collider.gameObject;
             hitTracker = hitObject.GetComponent<AlignmentTracker>();
-            if (hitTracker!= null)
+            
+            if (hitTracker == null) 
+                continue;
+            
+            if (AlignmentTracker.IsLockedView && hitTracker.IsLocked)
+            {
+                if (hitTracker.IsLocked)
+                    return hitTracker;
+            }
+            else if(!hitTracker.IsLocked)
             {
                 //Found a tracker
-                hasFoundTracker = true;
                 return hitTracker;
             }
         }
-        print("Tracker Found: " + hasFoundTracker);
-        
+
         return hitTracker;
+    }
+
+    public void ToggleLockView()
+    {
+        AlignmentTracker.ToggleLockView();
     }
     
     private AlignmentTracker RaycastSelection(bool findNew)
@@ -209,7 +211,16 @@ public class VRAligner : MonoBehaviour
                 if (!_selection.Contains(hitTracker))
                 {
                     //If we find a new tracker immediately return it
-                    return hitTracker;
+                    if (AlignmentTracker.IsLockedView && hitTracker.IsLocked)
+                    {
+                        if (hitTracker.IsLocked)
+                            return hitTracker;
+                    }
+                    else if(!hitTracker.IsLocked)
+                    {
+                        //Found a tracker
+                        return hitTracker;
+                    }
                 }
                 //If tracker isn't new, set it to null and keep looking
                 hitTracker = null;
@@ -217,7 +228,18 @@ public class VRAligner : MonoBehaviour
             else
             {
                 //Not looking for a unique tracker, return immediately 
-                return hitTracker;
+                
+                if (AlignmentTracker.IsLockedView && hitTracker.IsLocked)
+                {
+                    if (hitTracker.IsLocked)
+                        return hitTracker;
+                }
+                else if(!hitTracker.IsLocked)
+                {
+                    //Found a tracker
+                    return hitTracker;
+                }
+                
             }
 
         }
@@ -265,6 +287,17 @@ public class VRAligner : MonoBehaviour
         {
             
         }
+    }
+
+    public void ToggleLock()
+    {
+         foreach (AlignmentTracker alignmentTracker in _selection)
+         {
+             alignmentTracker.IsLocked = !alignmentTracker.IsLocked;
+             print("Wasd" + alignmentTracker.IsLocked);
+         }
+        print("Selection Size: " + _selection.Count);
+        ClearSelection();
     }
 
     public void ToggleSelect()

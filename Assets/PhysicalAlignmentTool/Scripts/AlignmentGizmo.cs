@@ -143,6 +143,7 @@ public class AlignmentGizmo : MonoBehaviour
     {
         transform.position = position;
         _isLocked = true;
+        
     }
 
     private void DrawGUI()
