@@ -41,19 +41,19 @@ namespace Valve.VR
             }
         }
         
-        public virtual SteamVR_Action_Boolean Undo
+        public virtual SteamVR_Action_Boolean D_Left
         {
             get
             {
-                return SteamVR_Actions.alignment_Undo;
+                return SteamVR_Actions.alignment_D_Left;
             }
         }
         
-        public virtual SteamVR_Action_Boolean Redo
+        public virtual SteamVR_Action_Boolean D_Right
         {
             get
             {
-                return SteamVR_Actions.alignment_Redo;
+                return SteamVR_Actions.alignment_D_Right;
             }
         }
         
@@ -70,6 +70,46 @@ namespace Valve.VR
             get
             {
                 return SteamVR_Actions.alignment_LeftHand;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean TakeGizmo
+        {
+            get
+            {
+                return SteamVR_Actions.alignment_TakeGizmo;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean Menu
+        {
+            get
+            {
+                return SteamVR_Actions.alignment_Menu;
+            }
+        }
+        
+        public virtual SteamVR_Action_Vector2 Analog
+        {
+            get
+            {
+                return SteamVR_Actions.alignment_Analog;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean D_Up
+        {
+            get
+            {
+                return SteamVR_Actions.alignment_D_Up;
+            }
+        }
+        
+        public virtual SteamVR_Action_Boolean D_Down
+        {
+            get
+            {
+                return SteamVR_Actions.alignment_D_Down;
             }
         }
         

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Drawing;
 using UnityEngine;
 
 
@@ -16,6 +17,7 @@ public class VRAligner : MonoBehaviour
     
     //Ontrigger enter updated
     private AlignmentGizmoHandle _hoveredHandle;
+    private AlignmentGizmoHandle _grippedHandle;
 
     private AlignmentTracker _hoveredTracker;
     
@@ -37,6 +39,7 @@ public class VRAligner : MonoBehaviour
         
         //Raycast UI
         RaycastUI();
+        DrawGUI();
     }
 
     private void RaycastUI()
@@ -79,6 +82,8 @@ public class VRAligner : MonoBehaviour
         {
             //We dont need to deselect because every selection overrides the active axis handle
             //print("SelectHandle: " + HoveredHandle.gameObject.name);
+
+            _grippedHandle = _hoveredHandle;
             _hoveredHandle.SelectHandle();
             _isTranslating = true;
             _alignerLastPos = transform.position;
@@ -90,7 +95,12 @@ public class VRAligner : MonoBehaviour
     public void ReleaseGizmo()
     {
         _isTranslating = false;
-        _hoveredHandle.DeselectHandle();
+        if (_grippedHandle)
+        {
+            _grippedHandle.DeselectHandle();
+            _grippedHandle = null;
+        }
+        
         
         //Undo/Redo Command
         Vector3[] selectionCurrentPosition = GetSelectionPositions();
@@ -320,13 +330,18 @@ public class VRAligner : MonoBehaviour
     public void IncrementMoveSpeed()
     {
         _moveSpeed += 0.1f;
-        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 2f);
+        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 3f);
     }
 
     public void DecrementMoveSpeed()
     {
         _moveSpeed -= 0.1f;
-        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 2f);
+        _moveSpeed = Mathf.Clamp(_moveSpeed, 0.1f, 3f);
+    }
+    
+    private void DrawGUI()
+    {
+        Draw.Label2D(transform.position + new Vector3(0,.025f,0),_moveSpeed.ToString(),48f);
     }
 }
 

@@ -124,6 +124,7 @@ public class AlignmentGizmo : MonoBehaviour
 
     public void RecenterGizmo()
     {
+        _isLocked = false;
         Vector3 selectionCenter = Vector3.zero;
         foreach (AlignmentTracker tracker in _focusedTrackers)
         {
@@ -141,18 +142,25 @@ public class AlignmentGizmo : MonoBehaviour
     public void PlaceGizmo(Vector3 position)
     {
         transform.position = position;
+        _isLocked = true;
     }
 
     private void DrawGUI()
     {
         if (_isMoving)
         {
-            //Vector3 deltaPos = Vector3.Scale(_deltaSum, _activeDirection);
+            using (Draw.WithLineWidth(3f))
+            {
+                Draw.Line(_startPos, _startPos + _deltaSum);
 
-            Draw.Line(_startPos, _startPos + _deltaSum, Color.blue);
+                
+                Vector3 spherePos = _isLocked ? _startPos + _deltaSum : _startPos;
+                Draw.WireSphere(spherePos, .025f);
 
-            Vector3 spherePos = _isLocked ? _startPos + _deltaSum : _startPos;
-            Draw.WireSphere(spherePos, .1f);
+                string distance = (_deltaSum.magnitude * 100f).ToString("0.00");
+
+                Draw.Label2D(_startPos+_deltaSum/2f + (transform.up * 0.01f),distance,24f );
+            }
         }
     }
 

@@ -51,7 +51,7 @@ public class AlignmentGizmoHandle : MonoBehaviour
         {
             Vector3 start = transform.position + (transform.forward * axisLength);
             Vector3 end = transform.position + (-transform.forward * axisLength);
-            Draw.Line(start,end);
+            Draw.Line(start,end,Color.cyan);
         }
     }
 
@@ -61,6 +61,7 @@ public class AlignmentGizmoHandle : MonoBehaviour
         if (aligner)
         {
             _isHovered = true;
+            print("hover");
         }
     }
 

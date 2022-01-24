@@ -93,12 +93,20 @@
     {
       "name": "/actions/UI/in/Close",
       "type": "boolean"
+    },
+    {
+      "name": "/actions/Test/in/pose",
+      "type": "pose"
     }
   ],
   "action_sets": [
     {
       "name": "/actions/Alignment",
       "usage": "leftright"
+    },
+    {
+      "name": "/actions/NewSet",
+      "usage": "single"
     },
     {
       "name": "/actions/InGame",
@@ -110,6 +118,10 @@
     },
     {
       "name": "/actions/UI",
+      "usage": "single"
+    },
+    {
+      "name": "/actions/Test",
       "usage": "single"
     }
   ],
